@@ -23,11 +23,11 @@ app.config['SECRET_KEY'] = 'your secret key'
 @app.route('/')
 def index():
     conn = get_db_connection()
-    posts = conn.execute('SELECT * FROM posts').fetchall()
+    posts = conn.execute('SELECT * FROM posts ORDER BY Created DESC').fetchall()
     conn.close()
     return render_template('index.html', posts=posts)
 
-@app.route('/<int:post_id>')
+@app.route('/Review/<int:post_id>')
 def post(post_id):
     post = get_post(post_id)
     return render_template('post.html', post=post)
@@ -46,10 +46,10 @@ def create():
                          (title, content))
             conn.commit()
             conn.close()
-            return redirect(url_for('index'))
+            return redirect(url_for('review'))
     return render_template('create.html')
 
-@app.route('/<int:id>/edit', methods=('GET', 'POST'))
+@app.route('/Review/<int:id>/edit', methods=('GET', 'POST'))
 def edit(id):
     post = get_post(id)
 
@@ -71,7 +71,7 @@ def edit(id):
     return render_template('edit.html', post=post)
 
 
-@app.route('/<int:id>/delete', methods=('POST',))
+@app.route('/Review/<int:id>/delete', methods=('POST',))
 def delete(id):
     post = get_post(id)
     conn = get_db_connection()
@@ -79,7 +79,7 @@ def delete(id):
     conn.commit()
     conn.close()
     flash('"{}" was successfully deleted!'.format(post['title']))
-    return redirect(url_for('index'))
+    return redirect(url_for('review'))
 
 @app.route('/Map', methods=('GET',))
 def map():
@@ -88,3 +88,11 @@ def map():
 @app.route('/Chat', methods=('GET',))
 def chat():
     return render_template('chat.html')
+
+@app.route('/Review', methods=('GET',))
+def review():
+    conn = get_db_connection()
+    posts = conn.execute('SELECT * FROM posts ORDER BY Created DESC').fetchall()
+    conn.close()
+    return render_template('review.html', posts=posts)
+

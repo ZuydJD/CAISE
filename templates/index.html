@@ -2,14 +2,14 @@
 
 {% block content %}
     <h1>{% block title %} Welcome to C.A.I.S.E.{% endblock %}</h1>
-    {% for post in posts %}
-        <a href="{{ url_for('post', post_id=post['id'])}}" >
-            <h2>{{ post['title']}}</h2>
+    <!-- {% for post in posts %}
+        <a href="#">
+            <h2>{{ post['title'] }}</h2>
         </a>
-        <span class="badge badge-primary"> {{ post['created']}}</span>
-        <a href="{{url_for('edit', id=post['id'])}}">
-            <span class="badge badge warning">Edit</span>
-        </a>
+        <span class="badge badge-primary">{{ post['created'] }}</span>
         <hr>
-    {% endfor %}
+    {% endfor %} -->
+    
+<p>Feel free to chat, check the map or leave a review on one of the courses!</p>
+
 {% endblock %}

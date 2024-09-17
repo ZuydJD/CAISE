@@ -3,6 +3,29 @@
 {% block content %}
 <h1>{% block title %} Add a Review {% endblock %}</h1>
 
+<!-- Course selection -->
+<div class="form-group">
+    <label for="course">Course</label>
+    <select name="course" class="form-control">
+        <option value="" disabled selected>Select a course</option>
+        <option value="course1" {% if request.form['course'] == 'course1' %}selected{% endif %}>Course 1</option>
+        <option value="course2" {% if request.form['course'] == 'course2' %}selected{% endif %}>Course 2</option>
+        <option value="course3" {% if request.form['course'] == 'course3' %}selected{% endif %}>Course 3</option>
+    </select>
+</div>
+
+<!-- score select -->
+<div class="form-group">
+    <label for="score">Score</label>
+    <select name="score" class="form-control">
+        <option value="" disabled selected>Select a score for the course</option>
+        {% for i in range(0, 11) %}
+        <option value="{{ i }}" {% if request.form['score'] == i %}selected{% endif %}>{{i}}</option>
+        {% endfor %}
+    </select>
+</div>
+
+<!-- titel -->
 <form method="post">
     <div class="form-group">
         <label for="title">Title</label>
@@ -11,17 +34,7 @@
                value="{{ request.form['title'] }}"></input>
     </div>
 
-    <div class="form-group">
-        <label for="course">Course</label>
-        <select name="course" class="form-control">
-            <option value="" disabled selected>Select a course</option>
-            <option value="course1" {% if request.form['course'] == 'course1' %}selected{% endif %}>Course 1</option>
-            <option value="course2" {% if request.form['course'] == 'course2' %}selected{% endif %}>Course 2</option>
-            <option value="course3" {% if request.form['course'] == 'course3' %}selected{% endif %}>Course 3</option>
-        </select>
-
-    </div>
-
+<!-- button -->
     <div class="form-group">
         <label for="content">Review</label>
         <textarea name="content" placeholder="Review content"

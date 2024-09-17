@@ -7,6 +7,7 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!-- <link href="static/CSS/style.css" rel="stylesheet" /> -->
 
     <title>C.A.I.S.E. Web</title>
     <!-- <title>{% block title %} {% endblock %}</title> -->
@@ -22,14 +23,17 @@
             <li class="nav-item active">
                 <a class="nav-link" href="#">About</a>
             </li>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               <a class="nav-link" href="{{url_for('create')}}"> Add a Review</a>
-            </li>
+            </li> -->
             <li class="nav-item">
-                <a class="nav-link" href="{{url_for('map')}}">Map</a> <!--Maak window aan voor kaart-->
+                <a class="nav-link" href="{{url_for('map')}}">Map</a> 
             </li>
             <li class="nav-item"></li>
-                <a class="nav-link" href="{{url_for('chat')}}">Chat</a> <!-- Link zetten voor chat window/API-->
+                <a class="nav-link" href="{{url_for('chat')}}">Chat</a> 
+            </li>
+            <li class="nav-item"></li>
+                <a class="nav-link" href="{{url_for('review')}}">Course Reviews</a> 
             </li>
             </ul>
         </div>
