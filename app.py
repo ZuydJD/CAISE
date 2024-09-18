@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, flash, redirect, request, get_flashed_messages
+from flask import Flask, render_template, url_for, flash, redirect, request, get_flashed_messages, jsonify
 import sqlite3
 from werkzeug.exceptions import abort
 
@@ -96,3 +96,25 @@ def review():
     conn.close()
     return render_template('review.html', posts=posts)
 
+# api stuff
+@app.route('/api')
+def home():
+    return "Welcome to the Flask API!"
+
+@app.route('/api/data', methods=['GET'])
+def get_data():
+    data={
+        'message': 'Hello from the Flask API!',
+        'status' : 'success'
+    }
+    return jsonify(data)
+
+@app.route('/api/post', methods=['POST'])
+def post_data():
+    data = request.get_json()
+    response = {
+        'received_data': data,
+        'message':'Data received successfully!',
+        'status' : 'success'
+    }
+    return jsonify(response)
