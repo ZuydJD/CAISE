@@ -1,7 +1,7 @@
 from flask import Flask, render_template, url_for, flash, redirect, request, get_flashed_messages, jsonify
 import sqlite3
 from werkzeug.exceptions import abort
-
+import requests
 
 def get_db_connection():
     conn = sqlite3.connect('database.db')
@@ -19,6 +19,8 @@ def get_post(post_id):
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your secret key'
+
+
 
 @app.route('/')
 def index():
@@ -96,25 +98,81 @@ def review():
     conn.close()
     return render_template('review.html', posts=posts)
 
+
+OOBABOOGA_API_URL = "http://127.0.0.1:5000/v1/completions" 
+
+HEADERS = {"Content-Type": "application/json"}
+
 # api stuff
-@app.route('/api')
-def home():
-    return "Welcome to the Flask API!"
+# @app.route('/api')
+# def api():
+#     return "Welcome to the Oobabooga Flask API!"
 
-@app.route('/api/data', methods=['GET'])
-def get_data():
-    data={
-        'message': 'Hello from the Flask API!',
-        'status' : 'success'
-    }
-    return jsonify(data)
+# @app.route('/api/generate', methods=['POST',])
+# def generate_text():
+#     try:
+#         data = request.get_json()
 
-@app.route('/api/post', methods=['POST'])
-def post_data():
-    data = request.get_json()
-    response = {
-        'received_data': data,
-        'message':'Data received successfully!',
-        'status' : 'success'
-    }
-    return jsonify(response)
+#         prompt = data.get('prompt', '')
+
+#         if not prompt:
+#             return jsonify({'error': 'Prompt is required!'}), 400
+        
+#         oobabooga_response = requests.post(OOBABOOGA_API_URL, json={
+#             "prompt": prompt,
+#             "max_new_tokens": 100
+#         })
+
+#         if oobabooga_response.status_code != 200:
+#             return jsonify({'error': 'Failed to get a response from Oobabooga API'}), 500
+        
+#         generated_text = oobabooga_response.json().get('results', [{}])[0].get('text', '').strip()
+
+#         return jsonify({
+#             'prompt': prompt,
+#             'generated_text': generated_text
+#         })
+    
+#     except Exception as e:
+#         return jsonify({'error': str(e)}), 500
+    
+# if __name__ == '__main__':
+#     app.run(debug=True)
+
+@app.route('/chat', methods=['POST'])
+def api():
+    try:
+        data = request.get_json()
+        history = data.get('history', [])
+        user_message = data.get('message', '')
+
+        if not user_message:
+            return jsonify({'error': 'User message is required'}), 400
+        
+        history.append({"role": "user", "content": user_message})
+
+        external_data = {
+            "model": "lmsys_vicuna-7b-v1.5",
+            "prompt": "testmessage say hi"
+            #"messages": history
+        }
+
+        response = request.post(OOBABOOGA_API_URL, headers=HEADERS, json=external_data, verify=False)
+
+        if response.status_code !=200:
+            return jsonify({'error': 'Failed to get a response from the external API'}), 500
+        
+        assistant_message = response.json()['choices'][0]['message']['content']
+
+        history.append({"role": "assistant", "content": assistant_message})
+
+        return jsonify({
+            'history': history,
+            'assistant_message': assistant_message
+        })
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+if __name__ == '__main__':
+    app.run(debug=True)
