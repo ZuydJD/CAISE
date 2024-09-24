@@ -1,7 +1,8 @@
 from flask import Flask, render_template, url_for, flash, redirect, request, get_flashed_messages, jsonify
+import requests
 import sqlite3
 from werkzeug.exceptions import abort
-import requests
+
 
 def get_db_connection():
     conn = sqlite3.connect('database.db')
@@ -20,14 +21,10 @@ def get_post(post_id):
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your secret key'
 
-
-
 @app.route('/')
 def index():
-    conn = get_db_connection()
-    posts = conn.execute('SELECT * FROM posts ORDER BY Created DESC').fetchall()
-    conn.close()
-    return render_template('index.html', posts=posts)
+    
+    return render_template('chat.html')
 
 @app.route('/Review/<int:post_id>')
 def post(post_id):
@@ -87,10 +84,6 @@ def delete(id):
 def map():
     return render_template('map.html')
 
-@app.route('/Chat', methods=('GET',))
-def chat():
-    return render_template('chat.html')
-
 @app.route('/Review', methods=('GET',))
 def review():
     conn = get_db_connection()
@@ -98,81 +91,38 @@ def review():
     conn.close()
     return render_template('review.html', posts=posts)
 
+# @app.route('/Chat', methods=('GET',))
+# def mock():
+#     return render_template('chat.html')
 
-OOBABOOGA_API_URL = "http://127.0.0.1:5000/v1/completions" 
+url = "http://127.0.0.1:5000/v1/chat/completions"
 
-HEADERS = {"Content-Type": "application/json"}
+headers = {
+    "Content-Type": "application/json"
+}
 
-# api stuff
-# @app.route('/api')
-# def api():
-#     return "Welcome to the Oobabooga Flask API!"
+history = []
 
-# @app.route('/api/generate', methods=['POST',])
-# def generate_text():
-#     try:
-#         data = request.get_json()
+@app.route('/Chat', methods=(['POST']))
+def chat():
+    user_message = request.form['message']
 
-#         prompt = data.get('prompt', '')
-
-#         if not prompt:
-#             return jsonify({'error': 'Prompt is required!'}), 400
-        
-#         oobabooga_response = requests.post(OOBABOOGA_API_URL, json={
-#             "prompt": prompt,
-#             "max_new_tokens": 100
-#         })
-
-#         if oobabooga_response.status_code != 200:
-#             return jsonify({'error': 'Failed to get a response from Oobabooga API'}), 500
-        
-#         generated_text = oobabooga_response.json().get('results', [{}])[0].get('text', '').strip()
-
-#         return jsonify({
-#             'prompt': prompt,
-#             'generated_text': generated_text
-#         })
+    if user_message.lower() == "quit":
+        return jsonify({"response": "Goodbye!"})
     
-#     except Exception as e:
-#         return jsonify({'error': str(e)}), 500
-    
-# if __name__ == '__main__':
-#     app.run(debug=True)
+    history.append({"role": "user", "content": user_message})
 
-@app.route('/chat', methods=['POST'])
-def api():
-    try:
-        data = request.get_json()
-        history = data.get('history', [])
-        user_message = data.get('message', '')
+    data = {
+        "mode": "chat-instruct",
+        "character": "C.A.I.S.E",
+        "messages": history
+    }
 
-        if not user_message:
-            return jsonify({'error': 'User message is required'}), 400
-        
-        history.append({"role": "user", "content": user_message})
+    response = requests.post(url, headers=headers, json=data, verify=False)
+    assistant_message = response.json()['choices'][0]['message']['content']
+    history.append({"role": "assistant", "content": assistant_message})
 
-        external_data = {
-            "model": "lmsys_vicuna-7b-v1.5",
-            "prompt": "testmessage say hi"
-            #"messages": history
-        }
+    return jsonify({"response": assistant_message})
 
-        response = request.post(OOBABOOGA_API_URL, headers=HEADERS, json=external_data, verify=False)
-
-        if response.status_code !=200:
-            return jsonify({'error': 'Failed to get a response from the external API'}), 500
-        
-        assistant_message = response.json()['choices'][0]['message']['content']
-
-        history.append({"role": "assistant", "content": assistant_message})
-
-        return jsonify({
-            'history': history,
-            'assistant_message': assistant_message
-        })
-    
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-    
-if __name__ == '__main__':
+if __name__ =='__main__':
     app.run(debug=True)

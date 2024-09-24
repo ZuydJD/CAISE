@@ -15,7 +15,7 @@ while True:
     else:
         history.append({"role": "user", "content": user_message})
         data = {
-            "mode": "chat",
+            "mode": "chat-instruct",
             "character": "C.A.I.S.E",
             "messages": history
         }   
@@ -24,3 +24,4 @@ while True:
     assistant_message = response.json()['choices'][0]['message']['content']
     history.append({"role": "assistant", "content": assistant_message})
     print(assistant_message)
+    # print(history)
