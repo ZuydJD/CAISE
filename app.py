@@ -24,7 +24,7 @@ app.config['SECRET_KEY'] = 'your secret key'
 @app.route('/')
 def index():
     
-    return render_template('chat.html')
+    return render_template('index.html')
 
 @app.route('/Review/<int:post_id>')
 def post(post_id):
@@ -91,9 +91,9 @@ def review():
     conn.close()
     return render_template('review.html', posts=posts)
 
-# @app.route('/Chat', methods=('GET',))
-# def mock():
-#     return render_template('chat.html')
+@app.route('/Chat', methods=('GET',))
+def mock():
+    return render_template('chat.html')
 
 url = "http://127.0.0.1:5000/v1/chat/completions"
 
