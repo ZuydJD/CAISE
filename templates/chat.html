@@ -4,34 +4,231 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat with CAISE</title>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Navbar styling */
+        nav {
+            width: 100%;
+            background-color: #525252;
+            color: white;
+            padding: 10px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            margin: 0;
+        }
+
+        nav ul li {
+            margin-right: 20px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Main container for chat */
+        .main-content {
+            margin-top: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: calc(100vh - 70px);
+        }
+
+        /* Chat container styling */
+        #chat-container {
+            width: 100%;
+            max-width: 600px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            height: 80vh;
+        }
+
+        h1 {
+            text-align: center;
+            background-color: #525252;
+            color: white;
+            padding: 15px;
+            margin: 0;
+        }
+
+        #chat-box {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        #chat-box p {
+            margin: 10px 0;
+        }
+
+        /* Prompt boxes styling */
+        .prompt-container {
+            display: flex;
+            flex-direction: space-around;
+            align-items: center;
+            justify-content:center;
+            height: 100vh;
+            margin-bottom: 15px;
+        }
+
+        .prompt-box {
+            margin: 10px;
+            padding: 15px;
+            background-color: #525252;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .prompt-box:hover {
+            background-color: #b30000;
+        }
+
+        #chat-form {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+            background-color: #f9f9f9;
+        }
+
+        #message {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            background-color: #525252;
+            color: white;
+            font-size: 16px;
+            border-radius: 5px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #b30000;
+        }
+
+        #typing {
+            font-style: italic;
+            color: gray;
+            padding-left: 10px;
+        }
+
+        .center {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
 </head>
 <body>
-    <h1>Chat with C.A.I.S.E</h1>
-    <div id="chat-box"></div>
-    <form id="chat-form">
-        <input type="text" id="message" name="message" placeholder="Enter your message" required>
-        <button type="submit">Send</button>
-    </form>
+
+    <!-- Navbar Section -->
+    <nav style="display: flex; align-items: center; justify-content: center; position: relative; width: 100%;">
+        <ul style="display: flex; margin: 0; padding: 0; list-style: none; position: absolute; left: 0;">
+            <li style="margin-right: 20px;"><a href="{{ url_for('index') }}">ADSAI</a></li>
+            <li style="margin-right: 25px;"><a href="{{ url_for('chat') }}">Chat</a></li>
+            <li style="margin-right: 25px;"><a href="{{ url_for('map') }}">Map</a></li>
+        </ul>
+        
+        <a href="{{ url_for('index') }}" style="margin: 0 10px;">
+            <img src="static/ADSAIlogo.jpg" alt="Logo" style="height: 40px;">
+        </a>
+    </nav>
+    
+
+    <!-- Main Content for Chat -->
+    <div class="main-content">
+        <div id="chat-container">
+            <h1>Chat with C.A.I.S.E.</h1>
+
+            <!-- Prompt Boxes -->
+            <div class="prompt-container">
+                <div class="prompt-box" data-prompt="I'm currently at [location] can you guide me to [location]?">Navigation</div>
+                <div class="prompt-box" data-prompt="Can you tell me more about the school?">School information</div>
+                <div class="prompt-box" data-prompt="Give me a random fact.">Let's Chat!</div>
+            </div>
+
+            <div id="chat-box"></div>
+            <div id="typing" style="display: none;">C.A.I.S.E. is typing...</div>
+            <form id="chat-form">
+                <input type="text" id="message" name="message" placeholder="Enter your message" required>
+                <button type="submit">Send</button>
+            </form>
+        </div>
+    </div>
 
     <script>
-        $(document).ready(function(){
+        $(document).ready(function() {
+            // When a prompt box is clicked, populate the input with the predefined message
+            $('.prompt-box').on('click', function() {
+                var promptText = $(this).data('prompt');
+                $('#message').val(promptText);  // Set the input value to the prompt
+            });
+
             $('#chat-form').on('submit', function(event) {
                 event.preventDefault();
                 var userMessage = $('#message').val();
+
+                // Append user's message to the chat box
+                $('#chat-box').append('<p><strong>You:</strong> ' + userMessage + '</p>');
                 
+                // Show typing indicator
+                $('#typing').show();
+
+                // Hide the prompt buttons after the message is sent
+                $('.prompt-container').hide();
+
+                // Send message to server
                 $.ajax({
                     url: '/Chat',
                     method: 'POST',
                     data: { message: userMessage },
                     success: function(response) {
-                        $('#chat-box').append('<p><strong>You:</strong> ' + userMessage + '</p>');
+                        // Remove typing indicator after receiving response
+                        $('#typing').hide();
+
+                        // Append assistant's response to the chat box
                         $('#chat-box').append('<p><strong>Assistant:</strong> ' + response.response + '</p>');
+
+                        // Scroll to the bottom of the chat box
+                        $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
+
+                        // Clear the input field
                         $('#message').val('');
                     }
                 });
             });
         });
     </script>
+
 </body>
 </html>
