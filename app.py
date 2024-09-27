@@ -24,7 +24,7 @@ app.config['SECRET_KEY'] = 'your secret key'
 @app.route('/')
 def index():
     
-    return render_template('index.html')
+    return render_template('chat.html')
 
 @app.route('/Review/<int:post_id>')
 def post(post_id):
