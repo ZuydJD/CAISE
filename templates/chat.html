@@ -9,6 +9,8 @@
 
     <!-- Link to external CSS file -->
     <link rel="stylesheet" href="static/style.css">
+    
+    
 </head>
 <body>
 
@@ -21,6 +23,8 @@
 
     <!-- Main Content for Chat -->
     <div class="main-content">
+        
+        <!-- Chat Container -->
         <div id="chat-container">
             <h1>Chat with C.A.I.S.E.</h1>
 
@@ -37,6 +41,14 @@
                 <input type="text" id="message" name="message" placeholder="Enter your message" required>
                 <button type="submit">Send</button>
             </form>
+        </div>
+
+        <!-- Side Container for Button and Map -->
+        <div id="side-container">
+            <button id="show-image-button">Show Map</button>
+
+            <!-- Hidden image initially -->
+            <img id="hidden-image" src="{{ url_for('static', filename='ADSAI.jpg') }}" alt="Map" style="max-width: 100%; height: auto;">
         </div>
     </div>
 
@@ -80,6 +92,16 @@
                         $('#message').val('');
                     }
                 });
+            });
+
+            // Toggle map visibility and button text
+            $('#show-image-button').on('click', function() {
+                $('#hidden-image').toggle();  // Toggle visibility of the image
+                if ($('#hidden-image').is(':visible')) {
+                    $(this).text('Hide Map');  // Change button text to "Hide Map"
+                } else {
+                    $(this).text('Show Map');  // Change button text to "Show Map"
+                }
             });
         });
     </script>

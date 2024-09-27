@@ -137,3 +137,57 @@ button:hover {
     margin-left: auto;
     margin-right: auto;
 }
+
+#show-image-button {
+    padding: 10px;
+    background-color: #525252;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    position: relative;
+    display: inline-block;
+    margin: 20px;
+}
+
+#show-image-button:hover {
+    background-color: #b30000;
+}
+
+/* Styling for the map container */
+#map-container {
+    text-align: center;
+    margin: 20px;
+}
+
+/* Hide the map image initially */
+#hidden-image {
+    display: none;
+    max-width: 90%;
+    height: auto;
+}
+
+/* Make sure the chat container occupies 80% of the screen width */
+.main-content {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-direction: row;
+    gap: 20px;
+    padding: 20px;
+}
+
+#chat-container {
+    width: 60%;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    height: 80vh;
+}
+
+#side-container {
+    width: 30%;
+    text-align: center;
+}
