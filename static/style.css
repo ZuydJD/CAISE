@@ -1,101 +1,193 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f7f7f8;
+    background-color: #f4f4f9;
     margin: 0;
     padding: 0;
+}
+
+/* Navbar styling */
+nav {
+    width: 100%;
+    background-color: #525252;
+    color: white;
+    padding: 10px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    margin: 0;
+}
+
+nav ul li {
+    margin-right: 20px;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+}
+
+/* Main container for chat */
+.main-content {
+    margin-top: 25px;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    height: calc(100vh - 70px);
 }
 
+/* Chat container styling */
 #chat-container {
     width: 100%;
-    max-width: 800px;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
+    max-width: 600px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
     display: flex;
     flex-direction: column;
-    height: 90vh;
+    height: 80vh;
+}
+
+h1 {
+    text-align: center;
+    background-color: #525252;
+    color: white;
+    padding: 15px;
+    margin: 0;
 }
 
 #chat-box {
-    flex: 1;
-    overflow-y: auto;
+    flex-grow: 1;
     padding: 20px;
-    background-color: #f7f7f8;
+    overflow-y: auto;
 }
 
 #chat-box p {
     margin: 10px 0;
 }
 
-#chat-box p strong {
-    display: block;
+/* Prompt boxes styling */
+.prompt-container {
+    display: flex;
+    flex-direction: space-around;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin-bottom: 15px;
 }
 
-#chat-box p.user {
-    text-align: right;
+.prompt-box {
+    margin: 10px;
+    padding: 15px;
+    background-color: #525252;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
 }
 
-#chat-box p.user strong {
-    color: #007aff;
+.prompt-box:hover {
+    background-color: #b30000;
 }
 
-#chat-box p.assistant {
-    text-align: left;
-}
-
-#chat-box p.assistant strong {
-    color: #333333;
-}
-
-#chat-input {
+#chat-form {
     display: flex;
     padding: 10px;
-    background-color: #ffffff;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid #ddd;
+    background-color: #f9f9f9;
 }
 
 #message {
-    flex: 1;
-    border: 1px solid #e0e0e0;
-    border-radius: 20px;
-    padding: 10px 15px;
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
     font-size: 16px;
-    outline: none;
-}
-
-#message:focus {
-    border-color: #007aff;
 }
 
 button {
+    padding: 10px 15px;
     border: none;
-    background-color: #007aff;
+    background-color: #525252;
     color: white;
     font-size: 16px;
-    padding: 10px 20px;
-    border-radius: 20px;
+    border-radius: 5px;
     margin-left: 10px;
     cursor: pointer;
 }
 
 button:hover {
-    background-color: #005bb5;
+    background-color: #b30000;
 }
 
-#chat-box::-webkit-scrollbar {
-    width: 8px;
+#typing {
+    font-style: italic;
+    color: gray;
+    padding-left: 10px;
 }
 
-#chat-box::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-#chat-box::-webkit-scrollbar-track {
-    background-color: transparent;
+#show-image-button {
+    padding: 10px;
+    background-color: #525252;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    position: relative;
+    display: inline-block;
+    margin: 20px;
+}
+
+#show-image-button:hover {
+    background-color: #b30000;
+}
+
+/* Styling for the map container */
+#map-container {
+    text-align: center;
+    margin: 20px;
+}
+
+/* Hide the map image initially */
+#hidden-image {
+    display: none;
+    max-width: 90%;
+    height: auto;
+}
+
+/* Make sure the chat container occupies 80% of the screen width */
+.main-content {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-direction: row;
+    gap: 20px;
+    padding: 20px;
+}
+
+#chat-container {
+    width: 60%;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    height: 80vh;
+}
+
+#side-container {
+    width: 30%;
+    text-align: center;
 }

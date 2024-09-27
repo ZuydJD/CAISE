@@ -4,34 +4,107 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat with CAISE</title>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Link to external CSS file -->
+    <link rel="stylesheet" href="static/style.css">
+    
+    
 </head>
 <body>
-    <h1>Chat with C.A.I.S.E</h1>
-    <div id="chat-box"></div>
-    <form id="chat-form">
-        <input type="text" id="message" name="message" placeholder="Enter your message" required>
-        <button type="submit">Send</button>
-    </form>
+
+    <!-- Navbar Section -->
+    <nav style="display: flex; align-items: center; justify-content: center; position: relative; width: 100%;">
+        <a href="{{ url_for('index') }}" style="margin: 0 10px;">
+            <img src="static/ADSAIlogo.jpg" alt="Logo" style="height: 40px;">
+        </a>
+    </nav>
+
+    <!-- Main Content for Chat -->
+    <div class="main-content">
+        
+        <!-- Chat Container -->
+        <div id="chat-container">
+            <h1>Chat with C.A.I.S.E.</h1>
+
+            <!-- Prompt Boxes -->
+            <div class="prompt-container">
+                <div class="prompt-box" data-prompt="I'm currently at [location] can you guide me to [location]?">Navigation</div>
+                <div class="prompt-box" data-prompt="Can you tell me more about the school?">School information</div>
+                <div class="prompt-box" data-prompt="Give me a random fact.">Let's Chat!</div>
+            </div>
+
+            <div id="chat-box"></div>
+            <div id="typing" style="display: none;">C.A.I.S.E. is typing...</div>
+            <form id="chat-form">
+                <input type="text" id="message" name="message" placeholder="Enter your message" required>
+                <button type="submit">Send</button>
+            </form>
+        </div>
+
+        <!-- Side Container for Button and Map -->
+        <div id="side-container">
+            <button id="show-image-button">Show Map</button>
+
+            <!-- Hidden image initially -->
+            <img id="hidden-image" src="{{ url_for('static', filename='ADSAI.jpg') }}" alt="Map" style="max-width: 100%; height: auto;">
+        </div>
+    </div>
 
     <script>
-        $(document).ready(function(){
+        $(document).ready(function() {
+            // When a prompt box is clicked, populate the input with the predefined message
+            $('.prompt-box').on('click', function() {
+                var promptText = $(this).data('prompt');
+                $('#message').val(promptText);  // Set the input value to the prompt
+            });
+
             $('#chat-form').on('submit', function(event) {
                 event.preventDefault();
                 var userMessage = $('#message').val();
+
+                // Append user's message to the chat box
+                $('#chat-box').append('<p><strong>You:</strong> ' + userMessage + '</p>');
                 
+                // Show typing indicator
+                $('#typing').show();
+
+                // Hide the prompt buttons after the message is sent
+                $('.prompt-container').hide();
+
+                // Send message to server
                 $.ajax({
                     url: '/Chat',
                     method: 'POST',
                     data: { message: userMessage },
                     success: function(response) {
-                        $('#chat-box').append('<p><strong>You:</strong> ' + userMessage + '</p>');
+                        // Remove typing indicator after receiving response
+                        $('#typing').hide();
+
+                        // Append assistant's response to the chat box
                         $('#chat-box').append('<p><strong>Assistant:</strong> ' + response.response + '</p>');
+
+                        // Scroll to the bottom of the chat box
+                        $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
+
+                        // Clear the input field
                         $('#message').val('');
                     }
                 });
             });
+
+            // Toggle map visibility and button text
+            $('#show-image-button').on('click', function() {
+                $('#hidden-image').toggle();  // Toggle visibility of the image
+                if ($('#hidden-image').is(':visible')) {
+                    $(this).text('Hide Map');  // Change button text to "Hide Map"
+                } else {
+                    $(this).text('Show Map');  // Change button text to "Show Map"
+                }
+            });
         });
     </script>
+
 </body>
 </html>
