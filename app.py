@@ -64,14 +64,16 @@ def login():
             return redirect(url_for("home"))
     return render_template("login.html")
 
+
 @app.route("/logout")
 def logout():
     logout_user()
-    return redirect(url_for("home"))
+    # return redirect(url_for("home"))
+    return render_template("chat.html")
 
 @app.route('/home')
 def home():
-    return render_template("chat.html")
+    return render_template("logged_in_chat.html")
 
 @app.route('/Chat', methods=['POST'])
 @login_required
