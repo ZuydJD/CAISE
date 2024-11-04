@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat with C.A.I.S.E.</title>
+    <title>Welcome Student! Come chat with C.A.I.S.E. !</title>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -16,25 +16,25 @@
 
     <!-- Navbar Section -->
     <nav style="display: flex; align-items: center; justify-content: space-between; position: relative; width: 100%; height: 50px;">
-        <ul style="display: flex; list-style: none; margin: 0; padding: 0;">
-            <li><a href="/login" style="margin-right: 15px; line-height: 80px;">Login</a></li>
-            <li><a href="/register" style="line-height: 80px;">Create Account</a></li>
-        </ul>
+    <ul style="display: flex; list-style: none; margin: 0; padding: 0;">
+        <li><a href="/logout" style="margin-right: 15px; line-height: 80px;">Log Out</a></li>
+        <li><a href="/register" style="line-height: 80px;">Create Account</a></li>
+    </ul>
+    
+    <a href="{{ url_for('index') }}" style="position: absolute; left: 50%; transform: translateX(-50%);">
+            <img src="static/ADSAIlogo.jpg" alt="Logo" style="height: 50px;">
+    </a>
+    
+    <div style="width: 100px;"></div>   
         
-        <a href="{{ url_for('index') }}" style="position: absolute; left: 50%; transform: translateX(-50%);">
-                <img src="static/ADSAIlogo.jpg" alt="Logo" style="height: 50px;">
-        </a>
-        
-        <div style="width: 100px;"></div>   
-            
-        </nav>
+    </nav>
 
     <!-- Main Content for Chat -->
     <div class="main-content">
         
         <!-- Chat Container -->
         <div id="chat-container">
-            <h1>Chat with C.A.I.S.E.</h1>
+            <h1>Congratulations for logging in! Come chat with C.A.I.S.E.!</h1>
 
             <!-- Prompt Boxes -->
             <div class="prompt-container">

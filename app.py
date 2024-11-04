@@ -2,127 +2,131 @@ from flask import Flask, render_template, url_for, flash, redirect, request, get
 import requests
 import sqlite3
 from werkzeug.exceptions import abort
-
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from sqlalchemy import inspect
 
 def get_db_connection():
     conn = sqlite3.connect('database.db')
     conn.row_factory = sqlite3.Row
     return conn
 
-def get_post(post_id):
-    conn = get_db_connection()
-    post = conn.execute('SELECT * FROM posts WHERE id = ?',
-                        (post_id,)).fetchone()
-    conn.close()
-    if post is None:
-        abort(404)
-    return post
-
+# Initialize Flask application
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your secret key'
+
+# Configure the SQLAlchemy database
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db.sqlite"
+app.config["SECRET_KEY"] = "your secret key"
+db = SQLAlchemy(app)
+
+# Initialize LoginManager
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+# User model for the database
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(150), unique=True, nullable=False)
+    password = db.Column(db.String(150), nullable=False)
+
+# db.init_app(app)
+with app.app_context():
+    db.create_all()
+
+# ChatHistory model for storing chat conversations
+class ChatHistory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    role = db.Column(db.String(50))
+    content = db.Column(db.Text)
+    timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+# Load user function for Flask-Login
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
 
 @app.route('/')
 def index():
-    
     return render_template('chat.html')
 
-@app.route('/Review/<int:post_id>')
-def post(post_id):
-    post = get_post(post_id)
-    return render_template('post.html', post=post)
+@app.route('/register', methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        user = User(username=request.form.get("username"),
+                     password=request.form.get("password"))
+        db.session.add(user)
+        db.session.commit()
+        return redirect(url_for("login"))
+    return render_template("sign_up.html")
 
-@app.route('/create', methods=('GET','POST'))
-def create():
-    if request.method == 'POST':
-        title = request.form['title']
-        content = request.form['content']
-
-        if not title:
-            flash('Title is required!')
-        else:
-            conn = get_db_connection()
-            conn.execute('INSERT INTO posts (title, content) VALUES (?,?)', 
-                         (title, content))
-            conn.commit()
-            conn.close()
-            return redirect(url_for('review'))
-    return render_template('create.html')
-
-@app.route('/Review/<int:id>/edit', methods=('GET', 'POST'))
-def edit(id):
-    post = get_post(id)
-
-    if request.method == 'POST':
-        title = request.form['title']
-        content = request.form['content']
-
-        if not title:
-            flash('Title is required!')
-        else:
-            conn = get_db_connection()
-            conn.execute('UPDATE posts SET title = ?, content = ?'
-                         ' WHERE id = ?',
-                         (title, content, id))
-            conn.commit()
-            conn.close()
-            return redirect(url_for('index'))
-
-    return render_template('edit.html', post=post)
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        user = User.query.filter_by(
+            username=request.form.get("username")).first()
+        if user.password == request.form.get("password"):
+            login_user(user)
+            return redirect(url_for("home"))
+    return render_template("login.html")
 
 
-@app.route('/Review/<int:id>/delete', methods=('POST',))
-def delete(id):
-    post = get_post(id)
-    conn = get_db_connection()
-    conn.execute('DELETE FROM posts WHERE id = ?', (id,))
-    conn.commit()
-    conn.close()
-    flash('"{}" was successfully deleted!'.format(post['title']))
-    return redirect(url_for('review'))
+@app.route("/logout")
+def logout():
+    logout_user()
+    # return redirect(url_for("home"))
+    return render_template("chat.html")
 
-@app.route('/Map', methods=('GET',))
-def map():
-    return render_template('map.html')
+@app.route('/home')
+def home():
+    return render_template("logged_in_chat.html")
 
-@app.route('/Review', methods=('GET',))
-def review():
-    conn = get_db_connection()
-    posts = conn.execute('SELECT * FROM posts ORDER BY Created DESC').fetchall()
-    conn.close()
-    return render_template('review.html', posts=posts)
+@app.route('/Chat', methods=['POST'])
+# @login_required
 
-@app.route('/Chat', methods=('GET',))
-def mock():
-    return render_template('chat.html')
-
-url = "http://127.0.0.1:5000/v1/chat/completions"
-
-headers = {
-    "Content-Type": "application/json"
-}
-
-history = []
-
-@app.route('/Chat', methods=(['POST']))
 def chat():
     user_message = request.form['message']
 
-    if user_message.lower() == "quit":
-        return jsonify({"response": "Goodbye!"})
-    
-    history.append({"role": "user", "content": user_message})
+    # Save user message to the database using SQLAlchemy
+    new_user_message = ChatHistory(role='user', content=user_message)
+    db.session.add(new_user_message)
+    db.session.commit()
 
+    # Retrieve chat history from the database
+    history = ChatHistory.query.order_by(ChatHistory.timestamp).all()
+
+
+    # Format chat history for API call
+    formatted_history = [{"role": h.role, "content": h.content} for h in history]
+
+
+    # API request data
     data = {
         "mode": "chat-instruct",
         "character": "C.A.I.S.E",
-        "messages": history
+        "messages": formatted_history
     }
 
+    # Send request to AI assistant API
+    url = "http://127.0.0.1:5000/v1/chat/completions"
+    headers = {"Content-Type": "application/json"}
     response = requests.post(url, headers=headers, json=data, verify=False)
-    assistant_message = response.json()['choices'][0]['message']['content']
-    history.append({"role": "assistant", "content": assistant_message})
 
+    # Get the assistant's message from the response
+    assistant_message = response.json()['choices'][0]['message']['content']
+
+    # Save the assistant's message to the database
+    new_assistant_message = ChatHistory(role='assistant', content=assistant_message)
+    db.session.add(new_assistant_message)
+    db.session.commit()
+    
+    # Return assistant's response to the frontend
     return jsonify({"response": assistant_message})
 
-if __name__ =='__main__':
+
+
+if __name__ == '__main__':
+    with app.app_context():
+            db.create_all()    
     app.run(debug=True)
+

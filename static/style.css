@@ -64,7 +64,7 @@ h1 {
 
 #chat-box {
     flex-grow: 1;
-    padding: 20px;
+    padding: 25px;
     overflow-y: auto;
 }
 
@@ -191,3 +191,6 @@ button:hover {
     width: 30%;
     text-align: center;
 }
+
+
+
