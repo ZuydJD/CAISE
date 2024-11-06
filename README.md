@@ -3,7 +3,7 @@
 ## Overview
 C.A.I.S.E. is a web application developed with Flask. This application forms the user interface for using a large language model. C.A.I.S.E. also makes use of the [Oobabooga Text Generation WebUI](https://github.com/oobabooga/text-generation-webui). The oobabooga user interface functions as the back-end of this application and has also been added to this repository, in the folder "Text-generation-webui".
 
-This project also makes use of the [Vicuna 7b](https://huggingface.co/lmsys/vicuna-7b-v1.5) large language model
+This project also makes use of the [Vicuna 7B](https://huggingface.co/lmsys/vicuna-7b-v1.5) large language model
 
 ## Installation
 ### Requirements
